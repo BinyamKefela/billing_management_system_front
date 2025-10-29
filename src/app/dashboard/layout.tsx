@@ -25,7 +25,7 @@ export default function Layout({
   return (
     <ThemeProvider
       attribute="class"
-      defaultTheme="system"
+      defaultTheme=""
       enableSystem
       disableTransitionOnChange>
       <SidebarProvider>
