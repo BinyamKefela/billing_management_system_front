@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+#  Billing Management System – Frontend (Next.js)
 
-## Getting Started
+A modern **Next.js** frontend for the **Billing Management System**, providing an intuitive interface for **Billers** and **Customers** to manage bills, payments, and notifications.
 
-First, run the development server:
+This frontend communicates with the Django backend through REST APIs.
 
+---
+
+##  Features
+
+✅ Built with **Next.js** and **React**  
+✅ Communicates with the Django backend API  
+✅ Environment-based backend configuration using `.env`  
+✅ Developer-friendly setup with hot reloading (`npm run dev`)  
+✅ Fully responsive and modern UI  
+
+---
+
+## Prerequisites
+
+Before running the frontend, make sure you have:
+
+- [Node.js](https://nodejs.org/) (v18 or higher recommended)  
+- [npm](https://www.npmjs.com/) (comes with Node.js)  
+- A running backend (Django + Docker) on your local machine or remote server
+
+Check your versions:
 ```bash
+node -v
+npm -v
+- Setup Instructions
+1️ - Clone the Repository
+bash
+Copy code
+git clone https://github.com/Binyamkefela/billing_management_front.git
+cd billing_management_front
+2️ - Install Dependencies
+bash
+Copy code
+npm install
+3️ - Create a .env File
+In the project root directory, create a .env file and add the following:
+
+bash
+Copy code
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8808/api
+⚠️ This variable defines the base URL of your Django backend API.
+If your backend is running on another host or port (e.g., production), update this value accordingly.
+
+- Run the Development Server
+Start the local development environment with:
+
+bash
+Copy code
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Then open:
+👉 http://localhost:3000
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Your app will automatically reload when you modify any file.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Build for Production
+To create an optimized production build:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+bash
+Copy code
+npm run build
+To run the built version:
 
-## Learn More
+bash
+Copy code
+npm start
+- Environment Summary
+Variable	Description	Default
+NEXT_PUBLIC_BACKEND_URL	Django backend API base URL	http://localhost:8808/api
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Connecting to Backend
+Make sure your Django backend (running via Docker) is accessible at:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+bash
+Copy code
+http://localhost:8808/api
+If both the backend and frontend are running locally, everything should work out of the box.
 
-## Deploy on Vercel
+- Author
+Binyam Kefela
+📧 binyamkefela196@gmail.com
+🌐 https://github.com/Binyamkefela
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+⭐ Thanks! from Binyamkefela ⭐
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
