@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { getAuthToken } from "@/app/auth/login/api";
 import { toast } from "react-toastify";
 import { EyeIcon, PencilIcon, TrashIcon, Plus, User, Mail, Phone, MapPin, Calendar, Shield, Search, Filter, Camera, Check, X } from "lucide-react";
+import { useBillerCheck } from "@/app/auth/biller_checker";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -61,6 +62,7 @@ type CustomUser = {
 };
 
 export default function UsersPage() {
+  useBillerCheck()
   const [users, setUsers] = useState<CustomUser[]>([]);
   const [availableGroups, setAvailableGroups] = useState<Group[]>([]);
   const [availablePermissions, setAvailablePermissions] = useState<Permission[]>([]);
@@ -133,7 +135,7 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      let url = `${BASE_URL}/get_users?is_customer=true&page=${page}&search=${encodeURIComponent(debouncedSearch)}`;
+      let url = `${BASE_URL}/get_users?ordering=-id&is_customer=true&page=${page}&search=${encodeURIComponent(debouncedSearch)}`;
      
     if (statusFilter === "active") {
         url += `&is_active=true`;

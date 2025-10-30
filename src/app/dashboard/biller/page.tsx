@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { getAuthToken } from "@/app/auth/login/api";
 import { toast } from "react-toastify";
 import { EyeIcon, PencilIcon, TrashIcon, Plus, User, Mail, Phone, MapPin, Calendar, Building, Search, Filter, Check, X } from "lucide-react";
+import { useSuperUserCheck } from "@/app/auth/super_user_check";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -45,6 +46,7 @@ type UserOption = {
 };
 
 export default function BillersPage() {
+  useSuperUserCheck();
   const [billers, setBillers] = useState<Biller[]>([]);
   const [availableUsers, setAvailableUsers] = useState<UserOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,7 +86,7 @@ export default function BillersPage() {
   const fetchBillers = async () => {
     setLoading(true);
     try {
-      const url = `${BASE_URL}/get_billers?page=${page}&search=${encodeURIComponent(debouncedSearch)}`;
+      const url = `${BASE_URL}/get_billers?ordering=-id&page=${page}&search=${encodeURIComponent(debouncedSearch)}`;
       
       const res = await fetch(url, {
         headers: { 

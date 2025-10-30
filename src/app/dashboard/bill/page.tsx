@@ -79,7 +79,7 @@ type Customer = {
 
 export default function BillsPage() {
   //usePermissionCheck("bms.view_bill");
-  //useBillerCheck();
+  useBillerCheck();
   const [bills, setBills] = useState<Bill[]>([]);
   const [billers, setBillers] = useState<Biller[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -105,7 +105,7 @@ export default function BillsPage() {
   const fetchBills = async () => {
     setLoading(true);
     try {
-      let url = `${BASE_URL}/get_bills?page=${page}&search=${encodeURIComponent(
+      let url = `${BASE_URL}/get_bills?ordering=-id&page=${page}&search=${encodeURIComponent(
         debouncedSearch
       )}`;
       if (statusFilter !== "all") {
@@ -366,13 +366,11 @@ export default function BillsPage() {
     }).format(parseFloat(amount));
   };
 
-  // Debug: Check customers data
   console.log("Current customers:", customers);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -401,11 +399,9 @@ export default function BillsPage() {
           </div>
         </div>
 
-        {/* Filters and Search */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             <div className="flex flex-col sm:flex-row gap-4 flex-1 w-full">
-              {/* Search */}
               <div className="relative flex-1 min-w-[300px]">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
@@ -454,9 +450,10 @@ export default function BillsPage() {
           ) : (
             <>
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full min-w-[1000px]">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
+                      <th>#</th>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         Bill #
                       </th>
@@ -498,11 +495,14 @@ export default function BillsPage() {
                         </td>
                       </tr>
                     ) : (
-                      bills.map((bill) => (
+                      bills.map((bill,index) => (
                         <tr
                           key={bill.id}
                           className="hover:bg-gray-50 transition-colors duration-150"
                         >
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {(page - 1) * 10 + index + 1}
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               <FileText className="w-4 h-4 text-blue-600" />

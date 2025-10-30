@@ -23,6 +23,7 @@ import {
   Check,
   X,
 } from "lucide-react";
+import { useSuperUserCheck } from "@/app/auth/super_user_check";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -81,6 +82,7 @@ type CustomUser = {
 };
 
 export default function UsersPage() {
+  useSuperUserCheck();
   const [users, setUsers] = useState<CustomUser[]>([]);
   const [availableGroups, setAvailableGroups] = useState<Group[]>([]);
   const [availablePermissions, setAvailablePermissions] = useState<
@@ -157,7 +159,7 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      let url = `${BASE_URL}/get_users?page=${page}&search=${encodeURIComponent(
+      let url = `${BASE_URL}/get_users?ordering=-id&page=${page}&search=${encodeURIComponent(
         debouncedSearch
       )}`;
       if (roleFilter !== "all") {
@@ -526,13 +528,13 @@ export default function UsersPage() {
                 </p>
               </div>
             </div>
-            <button
+            {/*<button
               onClick={() => handleOpen("add")}
               className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
               <Plus className="w-5 h-5" />
               Add User
-            </button>
+            </button>*/}
           </div>
         </div>
 

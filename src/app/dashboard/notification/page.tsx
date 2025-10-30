@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { getAuthToken } from "@/app/auth/login/api";
 import { toast } from "react-toastify";
 import { EyeIcon, TrashIcon, Plus, Search, Filter, Calendar, Mail, AlertTriangle, CheckCircle, XCircle, Clock, MessageSquare, Smartphone, User, FileText } from "lucide-react";
+import { useCustomerCheck } from "@/app/auth/customer_checker";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -53,6 +54,7 @@ type CustomNotification = {
 };
 
 export default function NotificationsPage() {
+  useCustomerCheck();
   const [notifications, setNotifications] = useState<CustomNotification[]>([]);
   const [availableBills, setAvailableBills] = useState<Bill[]>([]);
   const [availableCustomers, setAvailableCustomers] = useState<Customer[]>([]);

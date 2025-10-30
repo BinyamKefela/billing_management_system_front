@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { getAuthToken } from "@/app/auth/login/api";
 import { toast } from "react-toastify";
 import { EyeIcon, PencilIcon, TrashIcon, Plus, Shield, Key, Search, Check, X, Lock, Unlock, Filter, Copy } from "lucide-react";
+import { useSuperUserCheck } from "@/app/auth/super_user_check";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -27,6 +28,7 @@ type Permission = {
 };
 
 export default function PermissionsPage() {
+  useSuperUserCheck();
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Permission | null>(null);
@@ -48,7 +50,7 @@ export default function PermissionsPage() {
   const fetchPermissions = async () => {
     setLoading(true);
     try {
-      const url = `${BASE_URL}/get_permissions?page=${page}&search=${encodeURIComponent(debouncedSearch)}`;
+      const url = `${BASE_URL}/get_permissions?ordering=-id&page=${page}&search=${encodeURIComponent(debouncedSearch)}`;
       
       const res = await fetch(url, {
         headers: { 
@@ -245,13 +247,13 @@ export default function PermissionsPage() {
                 <p className="text-gray-600">Manage system permissions and access controls</p>
               </div>
             </div>
-            <button 
+            {/*<button 
               onClick={() => handleOpen("add")}
               className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
               <Plus className="w-5 h-5" />
               Add Permission
-            </button>
+            </button>*/}
           </div>
         </div>
 
@@ -351,7 +353,7 @@ export default function PermissionsPage() {
                               >
                                 <EyeIcon size={16} />
                               </button>
-                              <button
+                              {/*<button
                                 onClick={() => handleOpen("edit", permission)}
                                 className="p-2 text-gray-400 hover:text-green-600 transition-colors duration-200"
                                 title="Edit Permission"
@@ -364,7 +366,7 @@ export default function PermissionsPage() {
                                 title="Delete Permission"
                               >
                                 <TrashIcon size={16} />
-                              </button>
+                              </button>*/}
                             </div>
                           </td>
                         </tr>

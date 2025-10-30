@@ -18,6 +18,7 @@ import {
   Key,
   UserCheck,
 } from "lucide-react";
+import { useSuperUserCheck } from "@/app/auth/super_user_check";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -45,6 +46,7 @@ type CustomGroup = {
 };
 
 export default function GroupsPage() {
+  useSuperUserCheck();
   const [groups, setGroups] = useState<CustomGroup[]>([]);
   const [availablePermissions, setAvailablePermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,7 +87,7 @@ export default function GroupsPage() {
   const fetchGroups = async () => {
     setLoading(true);
     try {
-      let url = `${BASE_URL}/get_groups?page=${page}&search=${encodeURIComponent(
+      let url = `${BASE_URL}/get_groups?ordering=-id&page=${page}&search=${encodeURIComponent(
         debouncedSearch
       )}`;
 
@@ -122,6 +124,7 @@ export default function GroupsPage() {
       
       if (res.ok) {
         const data = await res.json();
+        console.log("Group permissions API response:", data);
         
         if (Array.isArray(data.group_permissions)) {
           if (data.group_permissions.length > 0) {
@@ -140,9 +143,11 @@ export default function GroupsPage() {
         
         return [];
       } else {
+        console.error("Failed to fetch group permissions:", await res.text());
         return [];
       }
     } catch (error) {
+      console.error("Error fetching group permissions:", error);
       return [];
     }
   };
@@ -180,15 +185,31 @@ export default function GroupsPage() {
     if (group) {
       if (type === "permissions") {
         try {
-          const currentPermissions = await fetchGroupPermissions(group.id);
-          setSelectedPermissions(currentPermissions);
+          console.log("Opening permissions modal for group:", group);
+          console.log("Group permissions from get_groups:", group.permissions);
+          
+          // First try to use the permissions from the group data itself
+          if (group.permissions && group.permissions.length > 0) {
+            console.log("Using permissions from group data:", group.permissions);
+            setSelectedPermissions(group.permissions);
+          } else {
+            // Fallback to API call if no permissions in group data
+            console.log("No permissions in group data, fetching from API...");
+            const currentPermissions = await fetchGroupPermissions(group.id);
+            console.log("Permissions from API:", currentPermissions);
+            setSelectedPermissions(currentPermissions);
+          }
         } catch (error) {
+          console.error("Error loading permissions:", error);
+          // Final fallback - use group permissions directly
           const groupPermissionCodenames = Array.isArray(group.permissions) 
             ? group.permissions
             : [];
+          console.log("Using fallback permissions:", groupPermissionCodenames);
           setSelectedPermissions(groupPermissionCodenames);
         }
       } else {
+        // For other modals, just use the group's permissions
         const groupPermissionCodenames = Array.isArray(group.permissions) 
           ? group.permissions
           : [];
@@ -384,6 +405,11 @@ export default function GroupsPage() {
 
     return grouped;
   };
+
+  // Debug logs
+  console.log("Available permissions:", availablePermissions);
+  console.log("Selected permissions:", selectedPermissions);
+  console.log("Groups:", groups);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -618,7 +644,7 @@ export default function GroupsPage() {
       </div>
 
       {modalType && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-white/20">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -825,6 +851,8 @@ export default function GroupsPage() {
                               <div className="space-y-2">
                                 {appPermissions.map((permissionCodename) => {
                                   const permission = availablePermissions.find(p => p.codename === permissionCodename);
+                                  const isSelected = isPermissionSelected(permissionCodename);
+                                  console.log(`Permission ${permissionCodename} is selected: ${isSelected}`);
                                   return (
                                     <label
                                       key={permissionCodename}
@@ -832,9 +860,7 @@ export default function GroupsPage() {
                                     >
                                       <input
                                         type="checkbox"
-                                        checked={isPermissionSelected(
-                                          permissionCodename
-                                        )}
+                                        checked={isSelected}
                                         onChange={() =>
                                           handlePermissionToggle(
                                             permissionCodename

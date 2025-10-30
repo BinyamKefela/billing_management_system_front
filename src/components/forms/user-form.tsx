@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Cookies from "js-cookie";
 
 const schema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -27,7 +28,13 @@ export default function UserForm() {
 
   useEffect(() => {
     if (getAuthToken()) {
-      router.push('/dashboard');
+      if(Cookies.get('is_superuser') === 'true'){
+        router.push('/dashboard/users');
+        return;
+      }
+      else{
+        router.push('/dashboard');
+      }
     }
   }, []);
 
@@ -35,8 +42,14 @@ export default function UserForm() {
     try {
       if (getAuthToken()) {
         console.log("already logged in");
-        router.push('/dashboard');
-        return;
+        if(Cookies.get('is_superuser') === 'true'){
+          router.push('/dashboard/users');
+          return;
+        }
+        else{
+          router.push('/dashboard');
+          return;
+        }
       }
       
       const response = await loginUser(data.email, data.password);
@@ -44,7 +57,11 @@ export default function UserForm() {
       console.log(response.access + "---------token");
       
       if (response.access) {
-        toast.success("Login successful!");
+        toast.success("Login successfull!");
+        if(Cookies.get('is_superuser') === 'true'){
+          router.push('/dashboard/users');
+          return;
+        }
         router.push('/dashboard');
       }
     } catch (err) {

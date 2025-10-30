@@ -1,403 +1,424 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, UserPlus, Building, Check, User, Phone, Mail, MapPin } from "lucide-react";
-import { toast } from "react-toastify";
-import Link from "next/link";
-import { getAuthToken } from "./auth/login/api";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { 
+  CreditCard, 
+  FileText, 
+  Users, 
+  Shield, 
+  BarChart3, 
+  Zap,
+  ArrowRight,
+  CheckCircle,
+  Building,
+  Smartphone,
+  Globe,
+  Lock,
+  Star,
+  TrendingUp,
+  Wallet
+} from "lucide-react";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-const signUpSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  first_name: z.string().min(1, "First name is required"),
-  middle_name: z.string().optional(),
-  last_name: z.string().min(1, "Last name is required"),
-  phone_number: z.string().optional(),
-  biller_ids: z.array(z.coerce.number()).min(1, "Please select at least one biller"),
-});
-
-type SignUpFormData = z.infer<typeof signUpSchema>;
-
-type Biller = {
-  id: number;
-  name: string;
-  company_name?: string;
-  address?: string;
-  phone_number?: string;
-  email?: string;
-};
-
-export default function SignUpPage() {
+export default function WelcomePage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [billers, setBillers] = useState<Biller[]>([]);
-  const [selectedBillers, setSelectedBillers] = useState<number[]>([]);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    watch,
-  } = useForm<SignUpFormData>({
-    resolver: zodResolver(signUpSchema),
-    defaultValues: {
-      biller_ids: [],
-    },
-  });
-
-  const formBillers = watch("biller_ids");
-  
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-     if(getAuthToken()){
-          router.push('/dashboard');
-        }
-    fetchBillers();
+    setIsVisible(true);
   }, []);
 
-  useEffect(() => {
-    setSelectedBillers(formBillers || []);
-  }, [formBillers]);
-
-  const fetchBillers = async () => {
-    try {
-      const res = await fetch(`${BASE_URL}/get_billers`);
-      const data = await res.json();
-      if (res.status === 200) {
-        setBillers(data.data || data.results || []);
-      }
-    } catch (error) {
-      console.error("Failed to fetch billers");
+  const features = [
+    {
+      icon: <CreditCard className="w-8 h-8" />,
+      title: "Easy Payments",
+      description: "Seamless payment processing with multiple payment methods including mobile money",
+      color: "text-orange-600"
+    },
+    {
+      icon: <FileText className="w-8 h-8" />,
+      title: "Smart Billing",
+      description: "Automated invoice generation and management for Ethiopian businesses",
+      color: "text-amber-600"
+    },
+    {
+      icon: <Users className="w-8 h-8" />,
+      title: "Customer Management",
+      description: "Efficient customer and biller relationship management",
+      color: "text-orange-500"
+    },
+    {
+      icon: <Shield className="w-8 h-8" />,
+      title: "Secure & Reliable",
+      description: "Bank-level security for all your financial transactions",
+      color: "text-amber-500"
+    },
+    {
+      icon: <BarChart3 className="w-8 h-8" />,
+      title: "Real-time Analytics",
+      description: "Comprehensive insights and reporting tools in ETB",
+      color: "text-orange-400"
+    },
+    {
+      icon: <Zap className="w-8 h-8" />,
+      title: "Fast Processing",
+      description: "Lightning-fast payment processing designed for Ethiopia",
+      color: "text-amber-400"
     }
+  ];
+
+  const stats = [
+    { number: "99.9%", label: "Uptime" },
+    { number: "10K+", label: "Transactions" },
+    { number: "500+", label: "Ethiopian Businesses" },
+    { number: "24/7", label: "Support" }
+  ];
+
+  const handleGetStarted = () => {
+    router.push("/auth/login");
   };
 
-  const handleBillerSelection = (billerId: number) => {
-    const currentBillers = formBillers || [];
-    let newBillers: number[];
-
-    if (currentBillers.includes(billerId)) {
-      newBillers = currentBillers.filter((id) => id !== billerId);
-    } else {
-      newBillers = [...currentBillers, billerId];
-    }
-
-    setValue("biller_ids", newBillers, { shouldValidate: true });
+  const handleBillerSignUp = () => {
+    router.push("/biller_sign_up");
   };
 
-  const onSubmit = async (data: SignUpFormData) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${BASE_URL}/sign_up`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      const responseData = await res.json();
-
-      if (res.status === 201) {
-        toast.success("check your email to complete registration!");
-        setValue("email", "");
-        setValue("password", "");
-        setValue("first_name", "");
-        setValue("middle_name", "");
-        setValue("last_name", "");
-        setValue("phone_number", "");
-        setValue("biller_ids", []);
-      } else {
-        toast.error(responseData.error || "Failed to create account");
-      }
-    } catch (error) {
-      toast.error("Network error. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+  const handleCustomerSignUp = () => {
+    router.push("/customer_sign_up");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <div className="text-center mb-8">
-            <div className="mx-auto w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-              <UserPlus className="w-8 h-8 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-100">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-32 w-80 h-80 bg-orange-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-amber-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-40 left-1/2 w-80 h-80 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="relative z-10">
+        <nav className="px-6 py-4">
+          <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl flex items-center justify-center">
+                <Wallet className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+                Kacha
+              </span>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account as a Customer</h1>
-            <p className="text-gray-600">Sign up to manage your bills efficiently</p>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={handleGetStarted}
+                className="px-6 py-2.5 border-2 border-orange-500 text-orange-600 rounded-xl font-semibold hover:bg-orange-500 hover:text-white transition-all duration-200"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={handleGetStarted}
+                className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl font-semibold hover:from-orange-600 hover:to-amber-600 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-2"
+              >
+                <span>Get Started</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
+        </nav>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-           
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                <Mail className="w-4 h-4" />
-                Email Address *
-              </label>
-              <input
-                {...register("email")}
-                type="email"
-                placeholder="user@example.com"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-              )}
-            </div>
+        {/* Hero Section */}
+        <section className="px-6 py-16 md:py-24">
+          <div className="max-w-7xl mx-auto text-center">
+            <div className={`transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+             
+              
+              <h1 className="text-5xl md:text-7xl font-bold mb-6">
+                <span className="bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-600 bg-clip-text text-transparent">
+                  Kacha
+                </span>
+                <br />
+                <span className="text-gray-900">Billing Management System</span>
+              </h1>
+              
+              <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+                Ethiopia's premier billing and payment platform. Streamline your finances 
+                with secure, fast, and reliable digital payments in ETB.
+              </p>
 
-            
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                <Eye className="w-4 h-4" />
-                Password *
-              </label>
-              <div className="relative">
-                <input
-                  {...register("password")}
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 pr-12"
-                />
+              {/* Registration Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
                 <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                  onClick={handleBillerSignUp}
+                  className="px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-amber-600 transition-all duration-200 transform hover:scale-105 shadow-xl flex items-center space-x-3 w-full sm:w-auto justify-center"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  <Building className="w-5 h-5" />
+                  <span>Register as Biller</span>
+                </button>
+                
+                <button
+                  onClick={handleCustomerSignUp}
+                  className="px-8 py-4 bg-white text-orange-600 border-2 border-orange-500 rounded-xl font-semibold text-lg hover:bg-orange-50 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-3 w-full sm:w-auto justify-center"
+                >
+                  <Users className="w-5 h-5" />
+                  <span>Register as Customer</span>
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-              )}
-            </div>
 
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                  <User className="w-4 h-4" />
-                  First Name *
-                </label>
-                <input
-                  {...register("first_name")}
-                  placeholder="John"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                />
-                {errors.first_name && (
-                  <p className="text-red-500 text-sm mt-1">{errors.first_name.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                  <User className="w-4 h-4" />
-                  Middle Name
-                </label>
-                <input
-                  {...register("middle_name")}
-                  placeholder="M."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                />
-              </div>
-
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                  <User className="w-4 h-4" />
-                  Last Name *
-                </label>
-                <input
-                  {...register("last_name")}
-                  placeholder="Doe"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                />
-                {errors.last_name && (
-                  <p className="text-red-500 text-sm mt-1">{errors.last_name.message}</p>
-                )}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+                <button
+                  onClick={handleGetStarted}
+                  className="px-8 py-4 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-xl font-semibold text-lg hover:from-orange-700 hover:to-amber-700 transition-all duration-200 transform hover:scale-105 shadow-xl flex items-center space-x-3"
+                >
+                  <span>Sign In to Account</span>
+                  <ArrowRight className="w-5 h-5" />
+                </button>
               </div>
             </div>
 
-            
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                <Phone className="w-4 h-4" />
-                Phone Number
-              </label>
-              <input
-                {...register("phone_number")}
-                placeholder="+251912345678"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              />
+            {/* Stats */}
+            <div className={`grid grid-cols-2 md:grid-cols-4 gap-8 mb-16 transition-all duration-1000 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+              {stats.map((stat, index) => (
+                <div key={index} className="text-center">
+                  <div className="text-3xl md:text-4xl font-bold text-orange-600 mb-2">
+                    {stat.number}
+                  </div>
+                  <div className="text-gray-600 font-medium">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
             </div>
 
-            
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-4">
-                <Building className="w-4 h-4" />
-                Select Your Billers *
-              </label>
-              
-              {errors.biller_ids && (
-                <p className="text-red-500 text-sm mb-3">{errors.biller_ids.message}</p>
-              )}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-80 overflow-y-auto p-2">
-                {billers.map((biller) => (
-                  <div
-                    key={biller.id}
-                    onClick={() => handleBillerSelection(biller.id)}
-                    className={`relative p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-105 ${
-                      selectedBillers.includes(biller.id)
-                        ? "border-green-500 bg-green-50 shadow-md"
-                        : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm"
-                    }`}
+            {/* Platform Preview */}
+            <div className={`relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20 transition-all duration-1000 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Customer Card */}
+                <div className="bg-gradient-to-br from-orange-50 to-amber-100 rounded-2xl p-6 border border-orange-200">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="p-2 bg-orange-100 rounded-lg">
+                      <Users className="w-6 h-6 text-orange-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900">For Customers</h3>
+                  </div>
+                  <ul className="space-y-3">
+                    {[
+                      "Pay bills anytime, anywhere",
+                      "Multiple payment options (Mobile Money, Bank, etc.)",
+                      "Complete payment history",
+                      "Auto-pay for recurring bills",
+                      "Instant payment notifications"
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start space-x-2 text-gray-700">
+                        <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={handleCustomerSignUp}
+                    className="w-full mt-4 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors duration-200"
                   >
-                    
-                    {selectedBillers.includes(biller.id) && (
-                      <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-1 shadow-lg animate-bounce">
-                        <Check className="w-4 h-4" />
-                      </div>
-                    )}
+                    Join as Customer
+                  </button>
+                </div>
 
-                    <div className="flex items-start gap-3">
-                      <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-                        selectedBillers.includes(biller.id) 
-                          ? "bg-green-100 text-green-600" 
-                          : "bg-blue-100 text-blue-600"
-                      }`}>
-                        <Building className="w-5 h-5" />
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 truncate">
-                          {biller.company_name || biller.name}
-                        </h3>
-                        {biller.name !== biller.company_name && biller.company_name && (
-                          <p className="text-sm text-gray-600 truncate">{biller.name}</p>
-                        )}
-                        
-                        <div className="mt-2 space-y-1">
-                          {biller.phone_number && (
-                            <div className="flex items-center gap-1 text-xs text-gray-500">
-                              <Phone className="w-3 h-3" />
-                              <span>{biller.phone_number}</span>
-                            </div>
-                          )}
-                          
-                          {biller.email && (
-                            <div className="flex items-center gap-1 text-xs text-gray-500">
-                              <Mail className="w-3 h-3" />
-                              <span className="truncate">{biller.email}</span>
-                            </div>
-                          )}
-                          
-                          {biller.address && (
-                            <div className="flex items-start gap-1 text-xs text-gray-500">
-                              <MapPin className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                              <span className="line-clamp-2">{biller.address}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                <div className="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-2xl p-6 border border-amber-200 relative overflow-hidden">
+                  <div className="absolute top-4 right-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                    POPULAR
+                  </div>
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="p-2 bg-amber-100 rounded-lg">
+                      <Building className="w-6 h-6 text-amber-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900">For Billers</h3>
+                  </div>
+                  <ul className="space-y-3">
+                    {[
+                      "Automated invoice generation",
+                      "Customer management dashboard",
+                      "Real-time revenue analytics in ETB",
+                      "Payment tracking and reporting",
+                      "Bulk operations and batch processing"
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start space-x-2 text-gray-700">
+                        <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={handleBillerSignUp}
+                    className="w-full mt-4 py-2 bg-amber-500 text-white rounded-lg font-semibold hover:bg-amber-600 transition-colors duration-200"
+                  >
+                    Join as Biller
+                  </button>
+                </div>
+
+                <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-200">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="p-2 bg-yellow-100 rounded-lg">
+                      <Shield className="w-6 h-6 text-yellow-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900">Security Features</h3>
+                  </div>
+                  <ul className="space-y-3">
+                    {[
+                      "End-to-end encryption",
+                      "National Bank compliance",
+                      "Two-factor authentication",
+                      "Regular security audits",
+                      "Data backup & recovery"
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start space-x-2 text-gray-700">
+                        <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-4 text-center">
+                    <div className="flex items-center justify-center space-x-1 text-yellow-600">
+                      <Star className="w-4 h-4 fill-current" />
+                      <Star className="w-4 h-4 fill-current" />
+                      <Star className="w-4 h-4 fill-current" />
+                      <Star className="w-4 h-4 fill-current" />
+                      <Star className="w-4 h-4 fill-current" />
+                      <span className="text-sm text-gray-600 ml-2">Rated 5/5</span>
                     </div>
                   </div>
-                ))}
-              </div>
-
-              {billers.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  <Building className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                  <p>No billers available at the moment</p>
                 </div>
-              )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="px-6 py-20 bg-white/50 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Why Choose{" "}
+                <span className="bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+                  Kacha
+                </span>
+                ?
+              </h2>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                Ethiopia's most trusted financial management platform designed 
+                for modern businesses and individuals.
+              </p>
             </div>
 
-            
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
-            >
-              {loading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Creating Account...
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {features.map((feature, index) => (
+                <div
+                  key={index}
+                  className={`bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group ${
+                    isVisible ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  style={{
+                    transitionDelay: `${index * 100}ms`
+                  }}
+                >
+                  <div className={`p-3 rounded-xl bg-gradient-to-br from-orange-50 to-amber-50 w-fit mb-4 group-hover:scale-110 transition-transform duration-300 ${feature.color}`}>
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
-              ) : (
-                "Create Account"
-              )}
-            </button>
-          </form>
+              ))}
+            </div>
+          </div>
+        </section>
 
-          <div className="text-center mt-6">
-            <p className="text-gray-600">
-              Already have an account?{" "}
-              <Link href="auth/login" className="text-blue-600 hover:text-blue-700 font-semibold transition-colors">sign in</Link>
-              
+        {/* CTA Section */}
+        <section className="px-6 py-20 bg-gradient-to-r from-orange-500 to-amber-500">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Ready to Transform Your Financial Management?
+            </h2>
+            <p className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
+              Join Ethiopia's fastest growing financial platform trusted by businesses and individuals nationwide.
             </p>
-          </div>
-        </div>
-
-        
-        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-xl p-8 text-white">
-          <div className="h-full flex flex-col justify-center">
-            <div className="text-center mb-8">
-              <Building className="w-16 h-16 mx-auto mb-4 opacity-90" />
-              <h2 className="text-3xl font-bold mb-4">Streamline Your Bill Payments</h2>
-              <p className="text-blue-100 text-lg">
-                Join thousands of customers who manage their bills efficiently with our platform
-              </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button
+                onClick={handleBillerSignUp}
+                className="px-8 py-4 bg-white text-orange-600 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-200 transform hover:scale-105 shadow-xl flex items-center space-x-3"
+              >
+                <Building className="w-5 h-5" />
+                <span>Register as Biller</span>
+              </button>
+              <button
+                onClick={handleCustomerSignUp}
+                className="px-8 py-4 border-2 border-white text-white rounded-xl font-semibold text-lg hover:bg-white hover:text-orange-600 transition-all duration-200 transform hover:scale-105 flex items-center space-x-3"
+              >
+                <Users className="w-5 h-5" />
+                <span>Register as Customer</span>
+              </button>
             </div>
-
-            <div className="space-y-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                  <Check className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-xl mb-1">Multiple Billers</h3>
-                  <p className="text-blue-100">Manage all your service providers in one place</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                  <Check className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-xl mb-1">Real-time Notifications</h3>
-                  <p className="text-blue-100">Get alerted about due dates and payments</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                  <Check className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-xl mb-1">Secure Payments</h3>
-                  <p className="text-blue-100">Your financial information is always protected</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 p-4 bg-white bg-opacity-10 rounded-xl">
-              <p className="text-blue-100 text-sm">
-                <strong>Selected Billers:</strong> {selectedBillers.length} biller(s) chosen
-              </p>
+            <div className="mt-8">
+              <button
+                onClick={handleGetStarted}
+                className="text-orange-100 hover:text-white font-semibold underline transition-colors duration-200"
+              >
+                Already have an account? Sign in here
+              </button>
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="px-6 py-8 bg-gray-900 text-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="flex items-center space-x-2 mb-4 md:mb-0">
+                <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg flex items-center justify-center">
+                  <Wallet className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-xl font-bold">Kacha Financial</span>
+              </div>
+              <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-400">
+                <span>Addis Ababa, Ethiopia</span>
+                <span>•</span>
+                <span>+251 900 000 000</span>
+                <span>•</span>
+                <span>info@kacha.et</span>
+              </div>
+            </div>
+            <div className="text-center mt-4 pt-4 border-t border-gray-700">
+              <p className="text-gray-400">
+                © 2024 Kacha Financial Management System. Proudly serving Ethiopia.
+              </p>
+            </div>
+          </div>
+        </footer>
       </div>
+
+      <style jsx global>{`
+        @keyframes blob {
+          0% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          33% {
+            transform: translate(30px, -50px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+          100% {
+            transform: translate(0px, 0px) scale(1);
+          }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
     </div>
   );
 }
