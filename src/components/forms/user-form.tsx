@@ -193,7 +193,7 @@ export default function UserForm() {
                 </div>
                 <span className="text-gray-300">•</span>
                 <div  className="text-purple-600 hover:text-purple-700 font-medium transition-colors">
-                 <Link href="/">
+                 <Link href="/customer_sign_up">
                   Register as Customer
                  </Link>
                 </div>
