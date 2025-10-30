@@ -135,7 +135,7 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      let url = `${BASE_URL}/get_users?ordering=-id&is_customer=true&page=${page}&search=${encodeURIComponent(debouncedSearch)}`;
+      let url = `${BASE_URL}/get_cutomers?ordering=-id&is_customer=true&page=${page}&search=${encodeURIComponent(debouncedSearch)}`;
      
     if (statusFilter === "active") {
         url += `&is_active=true`;
