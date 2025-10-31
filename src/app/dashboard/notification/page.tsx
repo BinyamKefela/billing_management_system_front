@@ -130,7 +130,7 @@ export default function NotificationsPage() {
         url += `&sent_via=${channelFilter}`;
       }
       if(Cookies.get('is_customer') === 'true'){
-        const customer_id = Cookies.get('customer_id');
+        const customer_id = Cookies.get("id") ? parseInt(Cookies.get("id") as string, 10) : 0;;
         url += `&customer__id=${customer_id}`;
       }
       
