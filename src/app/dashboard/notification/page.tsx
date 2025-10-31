@@ -8,6 +8,7 @@ import { getAuthToken } from "@/app/auth/login/api";
 import { toast } from "react-toastify";
 import { EyeIcon, TrashIcon, Plus, Search, Filter, Calendar, Mail, AlertTriangle, CheckCircle, XCircle, Clock, MessageSquare, Smartphone, User, FileText } from "lucide-react";
 import { useCustomerCheck } from "@/app/auth/customer_checker";
+import Cookies from "js-cookie";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -127,6 +128,10 @@ export default function NotificationsPage() {
       }
       if (channelFilter !== "all") {
         url += `&sent_via=${channelFilter}`;
+      }
+      if(Cookies.get('is_customer') === 'true'){
+        const customer_id = Cookies.get('customer_id');
+        url += `&customer__id=${customer_id}`;
       }
       
       const res = await fetch(url, {

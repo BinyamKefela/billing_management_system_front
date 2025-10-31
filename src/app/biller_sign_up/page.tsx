@@ -137,7 +137,6 @@ export default function BillerSignUpPage() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Step 1: Account Information */}
             {step === 1 && (
               <div className="space-y-6 animate-fadeIn">
                 <div>
